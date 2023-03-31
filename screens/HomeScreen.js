@@ -1,0 +1,129 @@
+import React, { Component } from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Header,
+  Image,
+} from 'react-native';
+
+import AppHeader from '../components/AppHeader';
+import db from '../config';
+
+export default class HomeScreen extends Component {
+  constructor(){
+    super();
+    this.state ={
+      teamA: 0,
+      teamB: 0
+    };
+  }
+  contarDeVotos(){
+    var votesRef= db.ref('/');
+    votesRef.on('value', (data) =>{
+      var teams = data.val();
+      this.setState({ 
+        teamA: teams.teamA,
+        teamB: teams.teamB 
+      });
+    })
+  }
+
+  
+
+  teamA(){
+    var teamARef = db.ref('/')
+    if(this.state.teamA === 0){
+        teamARef.update({
+          'teamA':1
+        })
+    }else{
+        var numeroDeVotosTeamA = parseInt(this.state.teamA);
+        teamARef.update({
+          'teamA': numeroDeVotosTeamA +1
+        })
+
+    }
+  }
+
+  teamB(){
+ 
+    var teamBRef = db.ref('/')
+    if(this.state.teamB === 0){
+        teamBRef.update({
+          'teamB':1
+        })
+    }else{
+        var numeroDeVotosteamB = parseInt(this.state.teamB);
+        teamBRef.update({
+          'teamB': numeroDeVotosteamB +1
+        })
+
+    }
+ }
+
+ componentDidMount(){
+  this.contarDeVotos()
+ }
+
+ 
+
+  render() {
+    return (
+      <View>
+        <AppHeader />
+        <View>
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity>
+              <Image
+                style={{ width: 300, height: 220, marginLeft: 5 }}
+                source={require('../assets/TeamImage.png')}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.ratingContainer}>
+            <Text style={{ textAlign: 'center',fontSize:25 }}>Vota aquí</Text>
+            <TouchableOpacity
+              style={styles.buttons}
+              onPress ={() =>{
+                this.teamA()
+              }}>
+              <Text style={{ fontSize:20}}>Equipo A</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.buttons}
+              onPress ={() =>{
+                this.teamB()
+              }}>
+              <Text style={{ fontSize:20}}>Equipo B</Text>
+            </TouchableOpacity>
+
+          </View>
+        </View>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  buttonsContainer: {
+    alignSelf: 'center',
+    marginTop: 50,
+  },
+  buttons: {
+    backgroundColor:"coral",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: 15,
+    margin:10,
+    width: 150,
+    height: 50,
+  },
+  ratingContainer: {
+    alignSelf: 'center',
+    marginTop: 50,
+  },
+});
